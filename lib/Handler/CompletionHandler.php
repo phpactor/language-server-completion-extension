@@ -80,7 +80,7 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
         foreach ($suggestions as $suggestion) {
             /** @var Suggestion $suggestion */
             $completionList->items[] = new CompletionItem(
-                $suggestion->name(),
+                $this->formatLabel($suggestion),
                 PhpactorToLspCompletionType::fromPhpactorType($suggestion->type()),
                 $suggestion->shortDescription(),
                 null,
@@ -96,9 +96,20 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
 
     public function registerCapabiltiies(ServerCapabilities $capabilities)
     {
-        $capabilities->completionProvider = new CompletionOptions(false, [':', '>']);
+        $capabilities->completionProvider = new CompletionOptions(false, [':', '>', '$']);
         $capabilities->signatureHelpProvider = new SignatureHelpOptions(['(', ',']);
     }
+
+    private function formatLabel(Suggestion $suggestion): string
+    {
+        switch ($suggestion->type()) {
+            case Suggestion::TYPE_VARIABLE:
+                return mb_substr($suggestion->label(), 1);
+            default:
+                return $suggestion->label();
+        }
+    }
+
 
     private function textEdit(Suggestion $suggestion, TextDocumentItem $textDocument): ?TextEdit
     {
