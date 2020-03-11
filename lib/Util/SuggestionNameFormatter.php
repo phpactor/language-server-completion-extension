@@ -4,22 +4,22 @@ namespace Phpactor\Extension\LanguageServerCompletion\Util;
 
 use Phpactor\Completion\Core\Suggestion;
 
-class SuggestionLabelFormatter
+class SuggestionNameFormatter
 {
     public function format(Suggestion $suggestion): string
     {
-        $label = $suggestion->label();
+        $name = $suggestion->name();
 
         switch ($suggestion->type()) {
             case Suggestion::TYPE_VARIABLE:
-                $label = mb_substr($label, 1);
+                $name = mb_substr($name, 1);
                 break;
             case Suggestion::TYPE_FUNCTION:
             case Suggestion::TYPE_METHOD:
-                $label = $label . '(';
+                $name = $name . '(';
                 break;
         }
 
-        return $label;
+        return $name;
     }
 }

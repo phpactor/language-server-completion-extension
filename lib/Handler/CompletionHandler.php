@@ -16,7 +16,7 @@ use Phpactor\Completion\Core\Completor;
 use Phpactor\Completion\Core\Suggestion;
 use Phpactor\Completion\Core\TypedCompletorRegistry;
 use Phpactor\Extension\LanguageServerCompletion\Util\PhpactorToLspCompletionType;
-use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionLabelFormatter;
+use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionNameFormatter;
 use Phpactor\Extension\LanguageServer\Helper\OffsetHelper;
 use Phpactor\LanguageServer\Core\Handler\CanRegisterCapabilities;
 use Phpactor\LanguageServer\Core\Handler\Handler;
@@ -42,9 +42,9 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
     private $provideTextEdit;
 
     /**
-     * @var SuggestionLabelFormatter
+     * @var SuggestionNameFormatter
      */
-    private $suggestionLabelFormatter;
+    private $suggestionNameFormatter;
 
     /**
      * @var Workspace
@@ -54,13 +54,13 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
     public function __construct(
         Workspace $workspace,
         TypedCompletorRegistry $registry,
-        SuggestionLabelFormatter $suggestionLabelFormatter,
+        SuggestionNameFormatter $suggestionNameFormatter,
         bool $provideTextEdit = false
     ) {
         $this->registry = $registry;
         $this->provideTextEdit = $provideTextEdit;
         $this->workspace = $workspace;
-        $this->suggestionLabelFormatter = $suggestionLabelFormatter;
+        $this->suggestionNameFormatter = $suggestionNameFormatter;
     }
 
     public function methods(): array
@@ -88,7 +88,7 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
         foreach ($suggestions as $suggestion) {
             /** @var Suggestion $suggestion */
             $completionList->items[] = new CompletionItem(
-                $this->suggestionLabelFormatter->format($suggestion),
+                $this->suggestionNameFormatter->format($suggestion),
                 PhpactorToLspCompletionType::fromPhpactorType($suggestion->type()),
                 $suggestion->shortDescription(),
                 null,

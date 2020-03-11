@@ -16,7 +16,7 @@ use Phpactor\Completion\Core\Suggestion;
 use Phpactor\Completion\Core\TypedCompletor;
 use Phpactor\Completion\Core\TypedCompletorRegistry;
 use Phpactor\Extension\LanguageServerCompletion\Handler\CompletionHandler;
-use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionLabelFormatter;
+use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionNameFormatter;
 use Phpactor\LanguageServer\Core\Rpc\ResponseMessage;
 use Phpactor\LanguageServer\Core\Session\Workspace;
 use Phpactor\LanguageServer\Test\HandlerTester;
@@ -117,7 +117,7 @@ class CompletionHandlerTest extends TestCase
         return new HandlerTester(new CompletionHandler(
             $this->workspace,
             $registry,
-            new SuggestionLabelFormatter(),
+            new SuggestionNameFormatter(),
             true
         ));
     }

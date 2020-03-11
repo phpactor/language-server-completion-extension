@@ -3,30 +3,27 @@
 namespace Phpactor\Extension\LanguageServerCompletion\Tests\Unit\Util;
 
 use Phpactor\Completion\Core\Suggestion;
-use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionLabelFormatter;
+use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionNameFormatter;
 use PHPUnit\Framework\TestCase;
 
-class SuggestionLabelFormatterTest extends TestCase
+class SuggestionNameFormatterTest extends TestCase
 {
     /**
-     * @var SuggestionLabelFormatter
+     * @var SuggestionNameFormatter
      */
     private $formatter;
 
     protected function setUp(): void
     {
-        $this->formatter = new SuggestionLabelFormatter();
+        $this->formatter = new SuggestionNameFormatter();
     }
 
     /**
      * @dataProvider dataProvider
      */
-    public function testFormat(string $type, string $label, string $expected)
+    public function testFormat(string $type, string $name, string $expected)
     {
-        $suggestion = Suggestion::createWithOptions('bar', [
-            'type' => $type,
-            'label' => $label,
-        ]);
+        $suggestion = Suggestion::createWithOptions($name, ['type' => $type]);
 
         $this->assertSame($expected, $this->formatter->format($suggestion));
     }
