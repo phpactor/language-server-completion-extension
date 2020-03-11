@@ -16,6 +16,7 @@ use Phpactor\Completion\Core\Completor;
 use Phpactor\Completion\Core\Suggestion;
 use Phpactor\Completion\Core\TypedCompletorRegistry;
 use Phpactor\Extension\LanguageServerCompletion\Util\PhpactorToLspCompletionType;
+use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionLabelFormatter;
 use Phpactor\Extension\LanguageServer\Helper\OffsetHelper;
 use Phpactor\LanguageServer\Core\Handler\CanRegisterCapabilities;
 use Phpactor\LanguageServer\Core\Handler\Handler;
@@ -41,6 +42,11 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
     private $provideTextEdit;
 
     /**
+     * @var SuggestionLabelFormatter
+     */
+    private $suggestionLabelFormatter;
+
+    /**
      * @var Workspace
      */
     private $workspace;
@@ -48,11 +54,13 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
     public function __construct(
         Workspace $workspace,
         TypedCompletorRegistry $registry,
+        SuggestionLabelFormatter $suggestionLabelFormatter,
         bool $provideTextEdit = false
     ) {
         $this->registry = $registry;
         $this->provideTextEdit = $provideTextEdit;
         $this->workspace = $workspace;
+        $this->suggestionLabelFormatter = $suggestionLabelFormatter;
     }
 
     public function methods(): array
@@ -80,7 +88,7 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
         foreach ($suggestions as $suggestion) {
             /** @var Suggestion $suggestion */
             $completionList->items[] = new CompletionItem(
-                $this->formatLabel($suggestion),
+                $this->suggestionLabelFormatter->format($suggestion),
                 PhpactorToLspCompletionType::fromPhpactorType($suggestion->type()),
                 $suggestion->shortDescription(),
                 null,
@@ -99,17 +107,6 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
         $capabilities->completionProvider = new CompletionOptions(false, [':', '>', '$']);
         $capabilities->signatureHelpProvider = new SignatureHelpOptions(['(', ',']);
     }
-
-    private function formatLabel(Suggestion $suggestion): string
-    {
-        switch ($suggestion->type()) {
-            case Suggestion::TYPE_VARIABLE:
-                return mb_substr($suggestion->label(), 1);
-            default:
-                return $suggestion->label();
-        }
-    }
-
 
     private function textEdit(Suggestion $suggestion, TextDocumentItem $textDocument): ?TextEdit
     {
