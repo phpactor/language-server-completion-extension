@@ -23,7 +23,10 @@ class SuggestionLabelFormatterTest extends TestCase
      */
     public function testFormat(string $type, string $label, string $expected)
     {
-        $suggestion = new Suggestion('bar', $type, null, null, $label);
+        $suggestion = Suggestion::createWithOptions('bar', [
+            'type' => $type,
+            'label' => $label,
+        ]);
 
         $this->assertSame($expected, $this->formatter->format($suggestion));
     }
