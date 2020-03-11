@@ -114,10 +114,10 @@ class CompletionHandlerTest extends TestCase
         $registry = new TypedCompletorRegistry([
             new TypedCompletor($completor, [ 'php' ])
         ]);
-        new SuggestionLabelFormatter();
         return new HandlerTester(new CompletionHandler(
             $this->workspace,
             $registry,
+            new SuggestionLabelFormatter(),
             true
         ));
     }
