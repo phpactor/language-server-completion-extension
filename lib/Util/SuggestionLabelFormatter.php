@@ -8,14 +8,18 @@ class SuggestionLabelFormatter
 {
     public function format(Suggestion $suggestion): string
     {
+        $label = $suggestion->label();
+
         switch ($suggestion->type()) {
             case Suggestion::TYPE_VARIABLE:
-                return mb_substr($suggestion->label(), 1);
+                $label = mb_substr($label, 1);
+                break;
             case Suggestion::TYPE_FUNCTION:
             case Suggestion::TYPE_METHOD:
-                return $suggestion->label() . '(';
-            default:
-                return $suggestion->label();
+                $label = $label . '(';
+                break;
         }
+
+        return $label;
     }
 }
