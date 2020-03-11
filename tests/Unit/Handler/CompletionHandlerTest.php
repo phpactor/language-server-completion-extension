@@ -16,6 +16,7 @@ use Phpactor\Completion\Core\Suggestion;
 use Phpactor\Completion\Core\TypedCompletor;
 use Phpactor\Completion\Core\TypedCompletorRegistry;
 use Phpactor\Extension\LanguageServerCompletion\Handler\CompletionHandler;
+use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionLabelFormatter;
 use Phpactor\LanguageServer\Core\Rpc\ResponseMessage;
 use Phpactor\LanguageServer\Core\Session\Workspace;
 use Phpactor\LanguageServer\Test\HandlerTester;
@@ -35,7 +36,7 @@ class CompletionHandlerTest extends TestCase
     private $position;
 
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->document = new TextDocumentItem();
         $this->document->uri = '/test';
@@ -113,6 +114,7 @@ class CompletionHandlerTest extends TestCase
         $registry = new TypedCompletorRegistry([
             new TypedCompletor($completor, [ 'php' ])
         ]);
+        new SuggestionLabelFormatter();
         return new HandlerTester(new CompletionHandler(
             $this->workspace,
             $registry,
@@ -128,7 +130,7 @@ class CompletionHandlerTest extends TestCase
             {
                 $this->suggestions = $suggestions;
             }
-        
+
             public function complete(TextDocument $source, ByteOffset $offset): Generator
             {
                 foreach ($this->suggestions as $suggestion) {

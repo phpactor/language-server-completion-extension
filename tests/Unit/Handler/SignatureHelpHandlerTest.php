@@ -35,7 +35,7 @@ class SignatureHelpHandlerTest extends TestCase
      */
     private $workspace;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->document = new TextDocumentItem();
         $this->document->uri = self::IDENTIFIER;
