@@ -7,6 +7,7 @@ use Phpactor\Container\ContainerBuilder;
 use Phpactor\Container\Extension;
 use Phpactor\Extension\Completion\CompletionExtension;
 use Phpactor\Extension\LanguageServerCompletion\Handler\SignatureHelpHandler;
+use Phpactor\Extension\LanguageServerCompletion\Util\SuggestionNameFormatter;
 use Phpactor\Extension\LanguageServer\LanguageServerExtension;
 use Phpactor\Extension\LanguageServerCompletion\Handler\CompletionHandler;
 use Phpactor\MapResolver\Resolver;
@@ -23,7 +24,8 @@ class LanguageServerCompletionExtension implements Extension
         $container->register('language_server_completion.handler.completion', function (Container $container) {
             return new CompletionHandler(
                 $container->get(LanguageServerExtension::SERVICE_SESSION_WORKSPACE),
-                $container->get(CompletionExtension::SERVICE_REGISTRY)
+                $container->get(CompletionExtension::SERVICE_REGISTRY),
+                new SuggestionNameFormatter()
             );
         }, [ LanguageServerExtension::TAG_SESSION_HANDLER => [
             'methods' => [
