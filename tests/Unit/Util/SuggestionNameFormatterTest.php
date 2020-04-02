@@ -15,7 +15,7 @@ class SuggestionNameFormatterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->formatter = new SuggestionNameFormatter();
+        $this->formatter = new SuggestionNameFormatter(true);
     }
 
     /**
