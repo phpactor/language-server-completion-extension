@@ -15,6 +15,8 @@ use Phpactor\MapResolver\Resolver;
 class LanguageServerCompletionExtension implements Extension
 {
     const PARAM_PROVIDE_TEXT_EDIT = 'language_server_completion.provide_text_edit';
+    const PARAM_TRIM_LEADING_DOLLAR = 'language_server_completion.trim_leading_dollar';
+
 
     /**
      * {@inheritDoc}
@@ -25,13 +27,17 @@ class LanguageServerCompletionExtension implements Extension
             return new CompletionHandler(
                 $container->get(LanguageServerExtension::SERVICE_SESSION_WORKSPACE),
                 $container->get(CompletionExtension::SERVICE_REGISTRY),
-                new SuggestionNameFormatter()
+                $container->get(SuggestionNameFormatter::class)
             );
         }, [ LanguageServerExtension::TAG_SESSION_HANDLER => [
             'methods' => [
                 'textDocument/completion'
             ]
         ]]);
+
+        $container->register(SuggestionNameFormatter::class, function (Container $container) {
+            return new SuggestionNameFormatter($container->getParameter(self::PARAM_TRIM_LEADING_DOLLAR));
+        });
 
         $container->register('language_server_completion.handler.signature_help', function (Container $container) {
             return new SignatureHelpHandler(
@@ -48,6 +54,7 @@ class LanguageServerCompletionExtension implements Extension
     {
         $schema->setDefaults([
             self::PARAM_PROVIDE_TEXT_EDIT => false,
+            self::PARAM_TRIM_LEADING_DOLLAR => false,
         ]);
     }
 }
