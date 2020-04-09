@@ -7,7 +7,6 @@ use LanguageServerProtocol\TextDocumentIdentifier;
 use LanguageServerProtocol\TextDocumentItem;
 use Phpactor\Extension\LanguageServerCompletion\Tests\IntegrationTestCase;
 use Phpactor\Extension\LanguageServer\Helper\OffsetHelper;
-use Phpactor\LanguageServer\Core\Rpc\ResponseMessage;
 use Phpactor\TestUtils\ExtractOffset;
 
 class HoverHandlerTest extends IntegrationTestCase

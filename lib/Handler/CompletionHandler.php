@@ -2,10 +2,8 @@
 
 namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
-use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
-use Generator;
 use LanguageServerProtocol\CompletionItem;
 use LanguageServerProtocol\CompletionList;
 use LanguageServerProtocol\CompletionOptions;

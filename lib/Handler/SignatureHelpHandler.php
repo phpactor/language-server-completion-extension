@@ -3,7 +3,6 @@
 namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
 use Amp\Promise;
-use Generator;
 use LanguageServerProtocol\Position;
 use LanguageServerProtocol\ServerCapabilities;
 use LanguageServerProtocol\SignatureHelp;
