@@ -2,7 +2,9 @@
 
 namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
+use Amp\Delayed;
 use Amp\Promise;
+use Amp\Success;
 use Generator;
 use LanguageServerProtocol\CompletionItem;
 use LanguageServerProtocol\CompletionList;
@@ -99,6 +101,8 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
                     null,
                     $this->textEdit($suggestion, $textDocument)
                 );
+
+                yield new Success(null);
             }
 
             return $completionList;
