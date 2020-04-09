@@ -2,6 +2,7 @@
 
 namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
+use Amp\CancellationToken;
 use Amp\Promise;
 use Amp\Success;
 use LanguageServerProtocol\CompletionItem;
@@ -71,9 +72,9 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
         ];
     }
 
-    public function completion(TextDocumentItem $textDocument, Position $position): Promise
+    public function completion(TextDocumentItem $textDocument, Position $position, CancellationToken $token): Promise
     {
-        return \Amp\call(function () use ($textDocument, $position) {
+        return \Amp\call(function () use ($textDocument, $position, $token) {
             $textDocument = $this->workspace->get($textDocument->uri);
 
             $languageId = $textDocument->languageId ?: 'php';
@@ -100,6 +101,7 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
                     $this->textEdit($suggestion, $textDocument)
                 );
 
+                $token->throwIfRequested();
                 yield new Success(null);
             }
 
