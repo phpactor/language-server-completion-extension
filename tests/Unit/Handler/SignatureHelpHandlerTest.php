@@ -49,15 +49,14 @@ class SignatureHelpHandlerTest extends TestCase
     public function testHandleHelpers()
     {
         $tester = $this->create([]);
-        $responses = $tester->dispatch(
+        $response = $tester->dispatch(
             'textDocument/signatureHelp',
             [
                 'textDocument' => new TextDocumentIdentifier(self::IDENTIFIER),
                 'position' => $this->position
             ]
         );
-        $this->assertInstanceOf(ResponseMessage::class, $responses[0]);
-        $list = $responses[0]->result;
+        $list = $response->result;
         $this->assertInstanceOf(LspSignatureHelp::class, $list);
     }
 

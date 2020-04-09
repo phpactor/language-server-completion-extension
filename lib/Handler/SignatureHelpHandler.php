@@ -2,6 +2,7 @@
 
 namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
+use Amp\Promise;
 use Generator;
 use LanguageServerProtocol\Position;
 use LanguageServerProtocol\ServerCapabilities;
@@ -48,19 +49,21 @@ class SignatureHelpHandler implements Handler, CanRegisterCapabilities
     public function signatureHelp(
         TextDocumentIdentifier $textDocument,
         Position $position
-    ): Generator {
-        $textDocument = $this->workspace->get($textDocument->uri);
+    ): Promise {
+        return \Amp\call(function () use ($textDocument, $position) {
+            $textDocument = $this->workspace->get($textDocument->uri);
 
-        $languageId = $textDocument->languageId ?: 'php';
+            $languageId = $textDocument->languageId ?: 'php';
 
-        try {
-            yield PhpactorToLspSignature::toLspSignatureHelp($this->helper->signatureHelp(
-                TextDocumentBuilder::create($textDocument->text)->language($languageId)->uri($textDocument->uri)->build(),
-                ByteOffset::fromInt($position->toOffset($textDocument->text))
-            ));
-        } catch (CouldNotHelpWithSignature $couldNotHelp) {
-            yield new SignatureHelp();
-        }
+            try {
+                return PhpactorToLspSignature::toLspSignatureHelp($this->helper->signatureHelp(
+                    TextDocumentBuilder::create($textDocument->text)->language($languageId)->uri($textDocument->uri)->build(),
+                    ByteOffset::fromInt($position->toOffset($textDocument->text))
+                ));
+            } catch (CouldNotHelpWithSignature $couldNotHelp) {
+                return new SignatureHelp();
+            }
+        });
     }
 
     public function registerCapabiltiies(ServerCapabilities $capabilities)

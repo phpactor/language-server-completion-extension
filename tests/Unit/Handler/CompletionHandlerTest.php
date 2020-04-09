@@ -50,17 +50,15 @@ class CompletionHandlerTest extends TestCase
     public function testHandleNoSuggestions()
     {
         $tester = $this->create([]);
-        $responses = $tester->dispatch(
+        $response = $tester->dispatch(
             'textDocument/completion',
             [
                 'textDocument' => $this->document,
                 'position' => $this->position
             ]
         );
-        $this->assertInstanceOf(ResponseMessage::class, $responses[0]);
-        $list = $responses[0]->result;
-        $this->assertInstanceOf(CompletionList::class, $list);
-        $this->assertEquals([], $list->items);
+        $this->assertInstanceOf(CompletionList::class, $response->result);
+        $this->assertEquals([], $response->result->items);
     }
 
     public function testHandleSuggestions()
@@ -69,20 +67,18 @@ class CompletionHandlerTest extends TestCase
             Suggestion::create('hello'),
             Suggestion::create('goodbye'),
         ]);
-        $responses = $tester->dispatch(
+        $response = $tester->dispatch(
             'textDocument/completion',
             [
                 'textDocument' => $this->document,
                 'position' => $this->position
             ]
         );
-        $this->assertInstanceOf(ResponseMessage::class, $responses[0]);
-        $list = $responses[0]->result;
-        $this->assertInstanceOf(CompletionList::class, $list);
+        $this->assertInstanceOf(CompletionList::class, $response->result);
         $this->assertEquals([
             new CompletionItem('hello'),
             new CompletionItem('goodbye'),
-        ], $list->items);
+        ], $response->result->items);
     }
 
     public function testHandleSuggestionsWithRange()
@@ -90,22 +86,19 @@ class CompletionHandlerTest extends TestCase
         $tester = $this->create([
             Suggestion::createWithOptions('hello', [ 'range' => PhpactorRange::fromStartAndEnd(1, 2)]),
         ]);
-        $responses = $tester->dispatch(
+        $response = $tester->dispatch(
             'textDocument/completion',
             [
                 'textDocument' => $this->document,
                 'position' => $this->position
             ]
         );
-        $this->assertInstanceOf(ResponseMessage::class, $responses[0]);
-        $list = $responses[0]->result;
-        $this->assertInstanceOf(CompletionList::class, $list);
         $this->assertEquals([
             new CompletionItem('hello', null, '', null, null, null, null, new TextEdit(
                 new Range(new Position(0, 1), new Position(0, 2)),
                 'hello'
             )),
-        ], $list->items);
+        ], $response->result->items);
     }
 
     private function create(array $suggestions): HandlerTester

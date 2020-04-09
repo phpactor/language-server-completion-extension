@@ -23,11 +23,10 @@ class LanguageServerCompletionExtensionTest extends IntegrationTestCase
         $position = new Position(1, 1);
         $tester->openDocument($document);
 
-        $responses = $tester->dispatch('textDocument/completion', [
+        $response = $tester->dispatchAndWait(1, 'textDocument/completion', [
             'textDocument' => $document,
             'position' => $position,
         ]);
-        $response = $responses[0];
 
         $this->assertInstanceOf(ResponseMessage::class, $response);
         $this->assertNull($response->responseError);
@@ -46,11 +45,10 @@ class LanguageServerCompletionExtensionTest extends IntegrationTestCase
         $tester->openDocument($document);
         $identifier = new TextDocumentIdentifier($document->uri);
 
-        $responses = $tester->dispatch('textDocument/signatureHelp', [
+        $response = $tester->dispatchAndWait(1, 'textDocument/signatureHelp', [
             'textDocument' => $identifier,
             'position' => $position,
         ]);
-        $response = $responses[0];
 
         $this->assertInstanceOf(ResponseMessage::class, $response);
         $this->assertNull($response->responseError);

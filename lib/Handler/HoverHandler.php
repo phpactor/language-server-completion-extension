@@ -2,6 +2,7 @@
 
 namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
+use Amp\Promise;
 use Generator;
 use LanguageServerProtocol\Hover;
 use LanguageServerProtocol\Position;
@@ -55,28 +56,30 @@ class HoverHandler implements Handler, CanRegisterCapabilities
     public function hover(
         TextDocumentIdentifier $textDocument,
         Position $position
-    ): Generator {
-        $document = $this->workspace->get($textDocument->uri);
-        $offset = $position->toOffset($document->text);
-        $document = TextDocumentBuilder::create($document->text)
-            ->uri($document->uri)
-            ->language('php')
-            ->build();
+    ): Promise {
+        return \Amp\call(function () use ($textDocument, $position) {
+            $document = $this->workspace->get($textDocument->uri);
+            $offset = $position->toOffset($document->text);
+            $document = TextDocumentBuilder::create($document->text)
+                ->uri($document->uri)
+                ->language('php')
+                ->build();
 
-        $offsetReflection = $this->reflector->reflectOffset($document, $offset);
+            $offsetReflection = $this->reflector->reflectOffset($document, $offset);
 
-        $symbolContext = $offsetReflection->symbolContext();
-        $info = $this->messageFromSymbolContext($symbolContext);
-        $info = $info ?: sprintf(
-            '%s %s',
-            $symbolContext->symbol()->symbolType(),
-            $symbolContext->symbol()->name()
-        );
+            $symbolContext = $offsetReflection->symbolContext();
+            $info = $this->messageFromSymbolContext($symbolContext);
+            $info = $info ?: sprintf(
+                '%s %s',
+                $symbolContext->symbol()->symbolType(),
+                $symbolContext->symbol()->name()
+            );
 
-        yield new Hover($info, new Range(
-            OffsetHelper::offsetToPosition($document->__toString(), $symbolContext->symbol()->position()->start()),
-            OffsetHelper::offsetToPosition($document->__toString(), $symbolContext->symbol()->position()->end())
-        ));
+            return new Hover($info, new Range(
+                OffsetHelper::offsetToPosition($document->__toString(), $symbolContext->symbol()->position()->start()),
+                OffsetHelper::offsetToPosition($document->__toString(), $symbolContext->symbol()->position()->end())
+            ));
+        });
     }
 
     public function registerCapabiltiies(ServerCapabilities $capabilities)

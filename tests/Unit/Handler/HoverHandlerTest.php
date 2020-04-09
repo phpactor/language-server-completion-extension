@@ -25,13 +25,11 @@ class HoverHandlerTest extends IntegrationTestCase
         $tester->initialize();
         $item = new TextDocumentItem(self::PATH, 'php', 1, $text);
         $tester->openDocument($item);
-        $responses = $tester->dispatch('textDocument/hover', [
+        $response = $tester->dispatchAndWait(1, 'textDocument/hover', [
             'textDocument' => new TextDocumentIdentifier(self::PATH),
             'position' => OffsetHelper::offsetToPosition($text, $offset)
         ]);
-        $tester->assertSuccess($responses);
-        $response = $responses[0];
-        $this->assertInstanceOf(ResponseMessage::class, $response);
+        $tester->assertSuccess($response);
         $result = $response->result;
         $this->assertInstanceOf(Hover::class, $result);
         $this->assertEquals($expected, $result->contents);

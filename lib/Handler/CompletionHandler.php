@@ -2,6 +2,7 @@
 
 namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
+use Amp\Promise;
 use Generator;
 use LanguageServerProtocol\CompletionItem;
 use LanguageServerProtocol\CompletionList;
@@ -70,36 +71,38 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
         ];
     }
 
-    public function completion(TextDocumentItem $textDocument, Position $position): Generator
+    public function completion(TextDocumentItem $textDocument, Position $position): Promise
     {
-        $textDocument = $this->workspace->get($textDocument->uri);
+        return \Amp\call(function () use ($textDocument, $position) {
+            $textDocument = $this->workspace->get($textDocument->uri);
 
-        $languageId = $textDocument->languageId ?: 'php';
-        $suggestions = $this->registry->completorForType(
-            $languageId
-        )->complete(
-            TextDocumentBuilder::create($textDocument->text)->language($languageId)->uri($textDocument->uri)->build(),
-            ByteOffset::fromInt($position->toOffset($textDocument->text))
-        );
-
-        $completionList = new CompletionList();
-        $completionList->isIncomplete = true;
-
-        foreach ($suggestions as $suggestion) {
-            /** @var Suggestion $suggestion */
-            $completionList->items[] = new CompletionItem(
-                $this->suggestionNameFormatter->format($suggestion),
-                PhpactorToLspCompletionType::fromPhpactorType($suggestion->type()),
-                $suggestion->shortDescription(),
-                null,
-                null,
-                null,
-                null,
-                $this->textEdit($suggestion, $textDocument)
+            $languageId = $textDocument->languageId ?: 'php';
+            $suggestions = $this->registry->completorForType(
+                $languageId
+            )->complete(
+                TextDocumentBuilder::create($textDocument->text)->language($languageId)->uri($textDocument->uri)->build(),
+                ByteOffset::fromInt($position->toOffset($textDocument->text))
             );
-        }
 
-        yield $completionList;
+            $completionList = new CompletionList();
+            $completionList->isIncomplete = true;
+
+            foreach ($suggestions as $suggestion) {
+                /** @var Suggestion $suggestion */
+                $completionList->items[] = new CompletionItem(
+                    $this->suggestionNameFormatter->format($suggestion),
+                    PhpactorToLspCompletionType::fromPhpactorType($suggestion->type()),
+                    $suggestion->shortDescription(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    $this->textEdit($suggestion, $textDocument)
+                );
+            }
+
+            return $completionList;
+        });
     }
 
     public function registerCapabiltiies(ServerCapabilities $capabilities)

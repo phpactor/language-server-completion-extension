@@ -14,7 +14,7 @@
     "require": {
         "php": "^7.3",
         "phpactor/container": "^1.0",
-        "phpactor/language-server-extension": "~0.2",
+        "phpactor/language-server-extension": "~0.3",
         "phpactor/completion-extension": "~0.1",
         "phpactor/worse-reflection-extension": "~0.2"
     },
