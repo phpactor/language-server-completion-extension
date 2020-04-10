@@ -32,7 +32,7 @@ class SuggestionNameFormatterTest extends TestCase
     {
         return [
             [Suggestion::TYPE_VARIABLE, '$foo', 'foo'],
-            [Suggestion::TYPE_FUNCTION, 'foo', 'foo('],
+            [Suggestion::TYPE_FUNCTION, 'foo', 'foo'],
             [Suggestion::TYPE_FIELD, 'foo', 'foo'],
         ];
     }
