@@ -2,6 +2,7 @@
 
 namespace Phpactor\Extension\LanguageServerCompletion\Tests\Unit\Handler;
 
+use Amp\Delayed;
 use Generator;
 use LanguageServerProtocol\CompletionItem;
 use LanguageServerProtocol\CompletionList;
@@ -49,7 +50,7 @@ class CompletionHandlerTest extends TestCase
     public function testHandleNoSuggestions()
     {
         $tester = $this->create([]);
-        $response = $tester->dispatch(
+        $response = $tester->dispatchAndWait(
             'textDocument/completion',
             [
                 'textDocument' => $this->document,
@@ -66,7 +67,7 @@ class CompletionHandlerTest extends TestCase
             Suggestion::create('hello'),
             Suggestion::create('goodbye'),
         ]);
-        $response = $tester->dispatch(
+        $response = $tester->dispatchAndWait(
             'textDocument/completion',
             [
                 'textDocument' => $this->document,
@@ -85,7 +86,7 @@ class CompletionHandlerTest extends TestCase
         $tester = $this->create([
             Suggestion::createWithOptions('hello', [ 'range' => PhpactorRange::fromStartAndEnd(1, 2)]),
         ]);
-        $response = $tester->dispatch(
+        $response = $tester->dispatchAndWait(
             'textDocument/completion',
             [
                 'textDocument' => $this->document,
@@ -98,6 +99,31 @@ class CompletionHandlerTest extends TestCase
                 'hello'
             )),
         ], $response->result->items);
+    }
+
+    public function testCancelReturnsPartialResults()
+    {
+        $tester = $this->create(
+            array_map(function() {
+                return Suggestion::createWithOptions('hello', [ 'range' => PhpactorRange::fromStartAndEnd(1, 2)]);
+            }, range(0, 10000))
+        );
+        $response = $tester->dispatch(
+            'textDocument/completion',
+            [
+                'textDocument' => $this->document,
+                'position' => $this->position
+            ]
+        );
+        $responses =\Amp\Promise\wait(\Amp\Promise\all([
+            $response,
+            \Amp\call(function () use ($tester) {
+                yield new Delayed(10);
+                $tester->cancel();
+            })
+        ]));
+
+        $this->assertGreaterThan(1, count($responses[0]->result->items));
     }
 
     private function create(array $suggestions): HandlerTester
@@ -114,7 +140,7 @@ class CompletionHandlerTest extends TestCase
         ));
     }
 
-    private function createCompletor(array $suggestions)
+    private function createCompletor(array $suggestions): Completor
     {
         return new class($suggestions) implements Completor {
             private $suggestions;
@@ -127,6 +153,9 @@ class CompletionHandlerTest extends TestCase
             {
                 foreach ($this->suggestions as $suggestion) {
                     yield $suggestion;
+
+                    // simulate work
+                    usleep(100);
                 }
             }
         };

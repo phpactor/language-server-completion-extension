@@ -4,6 +4,7 @@ namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
 use Amp\CancellationToken;
 use Amp\CancelledException;
+use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
 use LanguageServerProtocol\CompletionItem;
@@ -107,7 +108,7 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
                 } catch (CancelledException $cancellation) {
                     break;
                 }
-                yield new Success(null);
+                yield new Delayed(0);
             }
 
             return $completionList;

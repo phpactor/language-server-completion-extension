@@ -48,7 +48,7 @@ class SignatureHelpHandlerTest extends TestCase
     public function testHandleHelpers()
     {
         $tester = $this->create([]);
-        $response = $tester->dispatch(
+        $response = $tester->dispatchAndWait(
             'textDocument/signatureHelp',
             [
                 'textDocument' => new TextDocumentIdentifier(self::IDENTIFIER),
