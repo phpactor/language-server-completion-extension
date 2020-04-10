@@ -104,7 +104,7 @@ class CompletionHandlerTest extends TestCase
     public function testCancelReturnsPartialResults()
     {
         $tester = $this->create(
-            array_map(function() {
+            array_map(function () {
                 return Suggestion::createWithOptions('hello', [ 'range' => PhpactorRange::fromStartAndEnd(1, 2)]);
             }, range(0, 10000))
         );
