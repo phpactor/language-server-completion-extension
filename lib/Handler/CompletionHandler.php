@@ -3,6 +3,7 @@
 namespace Phpactor\Extension\LanguageServerCompletion\Handler;
 
 use Amp\CancellationToken;
+use Amp\CancelledException;
 use Amp\Promise;
 use Amp\Success;
 use LanguageServerProtocol\CompletionItem;
@@ -101,7 +102,11 @@ class CompletionHandler implements Handler, CanRegisterCapabilities
                     $this->textEdit($suggestion, $textDocument)
                 );
 
-                $token->throwIfRequested();
+                try {
+                    $token->throwIfRequested();
+                } catch (CancelledException $cancellation) {
+                    break;
+                }
                 yield new Success(null);
             }
 
