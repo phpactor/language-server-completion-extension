@@ -29,7 +29,7 @@ class LanguageServerCompletionExtensionTest extends IntegrationTestCase
         ]);
 
         $this->assertInstanceOf(ResponseMessage::class, $response);
-        $this->assertNull($response->responseError);
+        $this->assertNull($response->error);
         $this->assertInstanceOf(CompletionList::class, $response->result);
     }
 
@@ -51,7 +51,7 @@ class LanguageServerCompletionExtensionTest extends IntegrationTestCase
         ]);
 
         $this->assertInstanceOf(ResponseMessage::class, $response);
-        $this->assertNull($response->responseError);
+        $this->assertNull($response->error);
         $this->assertInstanceOf(SignatureHelp::class, $response->result);
     }
 }
